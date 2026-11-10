@@ -11,6 +11,11 @@ CLASS zcl_akit_mcp_tool_table_read DEFINITION
       IMPORTING is_args         TYPE zsakit_mcp_table_read_args
       RETURNING VALUE(rv_result) TYPE string.
 
+    "! Manual input schema: the auto-derived one cannot show the JSON filter
+    "! array format inside the string argument, so pin examples explicitly.
+    CLASS-METHODS get_schema
+      RETURNING VALUE(rs_schema) TYPE zcl_akit_mcp_types=>ty_tool_schema.
+
   PRIVATE SECTION.
     " ----- JSON filter condition (deserialized with /UI2/CL_JSON) -----
     TYPES:
@@ -39,6 +44,19 @@ CLASS zcl_akit_mcp_tool_table_read IMPLEMENTATION.
       write       = abap_false
       raw_args    = abap_false
       raw_schema  = '' ).
+  ENDMETHOD.
+
+
+  METHOD get_schema.
+    rs_schema-mode = zcl_akit_mcp_types=>gc_schema_manual.
+    rs_schema-schema =
+      `{"type":"object","properties":{` &&
+      `"tableName":{"type":"string","description":"透明表或视图名（只读），如 T000、MARA","minLength":1},` &&
+      `"fields":{"type":"string","description":"返回字段，逗号分隔；空 = 全部字段"},` &&
+      `"whereClause":{"type":"string","description":"过滤条件 JSON 数组文本：元素形如 {\"field\":\"MANDT\",\"op\":\"EQ\",\"value\":\"100\"}；op 支持 EQ/NE/LT/LE/GT/GE/LIKE，LIKE 值不自动补 %","examples":["[{\"field\":\"MANDT\",\"op\":\"EQ\",\"value\":\"100\"}]"]},` &&
+      `"orderBy":{"type":"string","description":"单字段排序，可带 ASC/DESC（缺省 ASC）；字段必须在返回字段中"},` &&
+      `"maxRows":{"type":"integer","description":"最大返回行数；0/缺省 = endpoint MAX_ROWS（默认 200，硬上限 500）","minimum":0}` &&
+      `},"required":["tableName"],"additionalProperties":false}`.
   ENDMETHOD.
 
 

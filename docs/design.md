@@ -15,7 +15,25 @@
 - 常规 ABAP 团队需要的：一个 ICF 节点 + 把已有或新写的 ABAP 方法暴露成 tool + 加 tool 时只写 ABAP 不写 JSON + 多个业务域各自一套 tool。
 - 项目本身要能被 `abap-cli` 维护：AFF 源码进 Git、`push` / `activate` 部署、`abap run` 自检，不依赖 abapGit。
 
-### 1.3 非目标（v1 明确不做）
+### 1.3 与参考项目的关系
+
+参考项目 `abap-ai/mcp`（V1，协议到 `2025-11-25`）与 `abap-ai/mcp2`（V2，以 `2026-07-28` 为主）是「MCP 全套协议 SDK」；本项目是「常规 ECC 项目的 tool 发布层」。差异（按两个仓库当前源码统计）：
+
+| 维度 | abap-ai/mcp (V1) | abap-ai/mcp2 (V2) | akit-mcp |
+|---|---|---|---|
+| 定位 | MCP server SDK | stateless MCP server SDK | ECC/常规开发友好的 tool 发布框架 |
+| 协议能力 | prompts / resources / tools / tasks / completions，有 session | prompts / resources / tasks / sampling / elicitation，stateless | 只有 tools（+ initialize / ping / discover / tools.list / tools.call） |
+| ABAP 对象 | 约 48 个类、5 张表（sessions/origins/servers/tasks/config） | 约 62 个类、4 张表（servers/origins/tasks/config） | 18 个类（含 8 个内置工具）、2 张表 |
+| 工具注册 | 继承 server base、注册工具对象/回调 | 同一路线 | 注册表一行 + 一个类（`GET_META`/`EXECUTE`）+ DDIC 入参结构 |
+| JSON | 自带 ajson（集成） | 自带 ajson（集成） | 直接用 SAP 交付的 `/UI2/CL_JSON`，不引入第三方 JSON 库 |
+| schema | DDIC schema builder + JSON schema builder/validator | 同 + outputSchema | DDIC 结构 → schema；可用可选方法 `GET_SCHEMA` 手写覆盖 |
+| 部署 | abapGit | abapGit（7.02 另发降级仓库） | abap-cli AFF + `install.mjs`，不依赖 abapGit |
+| 认证 | 内置 OAuth handler | 无默认 auth 检查 | 复用 ICF 登录；tool 内标准 `AUTHORITY-CHECK` |
+| 维护体量 | 大，跟协议演进 | 大，跟协议演进 | 小，主攻 tool 层与 7.40+ 兼容 |
+
+取舍：协议广度与生态兼容靠参考项目；本项目换来的是一行注册工具、极少对象、ECC 可维护与可直接阅读的 tool 语义。
+
+### 1.4 非目标（v1 明确不做）
 
 - SSE / 服务端主动推送、会话（`Mcp-Session-Id`）、`resources` / `prompts` / `sampling` / `elicitation` / `tasks` / `completions` / `logging`。
 - 写 SAP 开发对象（建类、改源码、激活、传输）——由 `abap-cli` 承担，本服务专注「运行期能力暴露」。
@@ -177,6 +195,32 @@ raw_schema  TYPE string        " raw 模式的 inputSchema JSON
 - 调用方式：`CALL METHOD (class_name)=>(method_name) EXPORTING/RECEIVING ...`（静态参数名，动态类/方法名；真机验证 7.57 可用，7.50 语法同源）。
 - 调用前先查 TADIR（类必须存在）与 DD03L（结构必须存在），避免 RTTI/dynamic call 在缺对象时抛不可捕获的运行期错误。
 - 注册表只信任 admin 维护的行；工具类不存在 / 元数据损坏 → 该 tool 在 `tools/list` 里**跳过**（不拖垮整个列表），`ZCL_AKIT_MCP_SETUP` 会报出坏行。
+
+### 4.5 inputSchema 来源：自动 / 手动（可选 `GET_SCHEMA`）
+
+默认行为：`args_struct` → 自动生成 JSON Schema（字段名、类型、required、DDIC 文本）。如果自动结果不够用（例如字符串参数内部承载 JSON 数组，想补 `examples` / `minLength`），工具类可以额外实现一个**可选的类方法** `GET_SCHEMA`：
+
+```abap
+CLASS-METHODS get_schema
+  RETURNING VALUE(rs_schema) TYPE zcl_akit_mcp_types=>ty_tool_schema.
+
+METHOD get_schema.
+  rs_schema-mode   = zcl_akit_mcp_types=>gc_schema_manual.
+  rs_schema-schema = '{"type":"object","properties":{...},"required":[...]}'.
+ENDMETHOD.
+```
+
+`ty_tool_schema`：
+
+| 字段 | 说明 |
+|---|---|
+| `mode` | `A` = AUTO（缺省，结构自动生成）、`M` = MANUAL（用 `schema`）、`N` = 无参数 |
+| `struct_name` | AUTO 模式下可指定另一个 DDIC 结构（空 = 用 `args_struct`） |
+| `schema` | MANUAL 模式的 JSON Schema 文本；非法 JSON 时退化为空 `properties` |
+
+框架在 `tools/list` 时动态调用 `GET_SCHEMA`：方法不存在（`CX_SY_DYN_CALL_ILLEGAL_METHOD`）或内部异常 → 回退 AUTO，单个 tool 的坏实现不会拖垮列表。DDIC 绑定与它无关：`EXECUTE` 的入参仍由 `args_struct`（或 `raw_args`）决定。内置工具 `table_read` 用 MANUAL schema 给 `whereClause` 增加过滤数组示例。
+
+JSON 处理边界（依赖 SAP 交付的 `/UI2/CL_JSON`）：typed deserialize 不应用 `name_mappings`（映射只在动态 `GENERATE`/`REF TO DATA` 路径生效），所以 `_meta` 的命名空间键先做文本提取再反序列化；详见 [compatibility.md](compatibility.md) 第 2 节与 SAP 官方开源版 [SAP/abap-to-json](https://github.com/SAP/abap-to-json)。
 
 ## 5. 多 endpoint、表与配置
 

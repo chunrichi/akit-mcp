@@ -18,6 +18,7 @@
 - **多 endpoint**：注册表 `ZTAKIT_MCP_TOOL` 的 `SERVER` 决定 endpoint 与工具集；配置表 `ZTAKIT_MCP_CONF` 按 endpoint 配置、`*` 为全局默认；根路径返回 endpoint 目录。
 - **一行注册工具**：tool 类实现 `GET_META` + `EXECUTE`，入参走 DDIC 结构；框架自动把结构转成 JSON Schema（字段名、类型、`@EndUserText.label` / 数据元素文本），并完成参数反序列化与动态 `CALL METHOD`。
 - **8 个内置只读工具**：`sap_info`、`object_search`、`source_read`、`syntax_check`、`ddic_get`、`table_read`、`tcode_info`、`message_text`。
+- **schema 来源可选**：工具类可实现可选方法 `GET_SCHEMA`（`ty_tool_schema`）在 AUTO（DDIC 结构）/ MANUAL（手写 JSON Schema）/ NONE 之间选择；缺省/异常回退 AUTO。`table_read` 用 MANUAL schema 给 `whereClause` 补 JSON 过滤示例。
 - **配置项**：`ENABLED`（总开关）、`READ_ONLY`（默认只读）、`MAX_ROWS`（默认 200，硬顶 5000）、`ORIGINS`（CORS 白名单）、`INSTRUCTIONS`、`TITLE`。
 - **安装与自检**：AFF 源码进 Git + `abap-cli` 部署；`node scripts/install.mjs` 幂等创建/推送/激活对象与 ICF 节点；`abap run zcl_akit_mcp_setup` 幂等播种内置工具并输出自检报告；`abap run zcl_akit_mcp_selftest` 校验协议分发与错误码；`scripts/akit-mcp.mjs` 本地客户端调试。
 - **文档与 CI**：中英 README、协议/工具/写工具/安全/兼容性/排障文档、AFF 与文档链接校验脚本、GitHub Actions `verify`。

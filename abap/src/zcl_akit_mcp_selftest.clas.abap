@@ -99,6 +99,18 @@ CLASS zcl_akit_mcp_selftest IMPLEMENTATION.
                      is_request = request( iv_body = `{"jsonrpc":"2.0","id":109,"method":"tools/call",`
                        && `"params":{"name":"object_search","arguments":{"pattern":"ZZZ_NO_SUCH_OBJ_*"}}}` ) ) TO lt_cases.
 
+    CLEAR ls_case.
+    ls_case-name   = `schema_override_probe`.
+    DATA lt_tools TYPE zcl_akit_mcp_types=>ty_tools.
+    lt_tools = zcl_akit_mcp_tools=>load( zcl_akit_mcp_types=>gc_default_endpoint ).
+    READ TABLE lt_tools INTO DATA(ls_tool) WITH KEY meta-name = `table_read`.
+    IF sy-subrc = 0.
+      ls_case-body = ls_tool-schema.
+    ELSE.
+      ls_case-body = `table_read not registered`.
+    ENDIF.
+    APPEND ls_case TO lt_cases.
+
     APPEND run_case( iv_name    = `legacy_unknown_tool`
                      is_request = request( iv_body = `{"jsonrpc":"2.0","id":4,"method":"tools/call",`
                        && `"params":{"name":"no_such_tool","arguments":{}}}` ) ) TO lt_cases.

@@ -33,6 +33,17 @@ CLASS zcl_akit_mcp_types DEFINITION
 
     TYPES ty_tools TYPE STANDARD TABLE OF ty_tool WITH DEFAULT KEY.
 
+    "! Optional schema override returned by a tool class' GET_SCHEMA method.
+    "! mode = A: derive from DDIC (struct_name may override args_struct)
+    "!        M: use schema (JSON Schema object text)
+    "!        N: no parameters
+    TYPES:
+      BEGIN OF ty_tool_schema,
+        mode        TYPE char1,
+        struct_name TYPE string,
+        schema      TYPE string,
+      END OF ty_tool_schema.
+
     TYPES:
       BEGIN OF ty_call_result,
         result_json TYPE string,
@@ -230,6 +241,11 @@ CLASS zcl_akit_mcp_types DEFINITION
       " Fixed tool method / parameter names (the dynamic call contract).
       gc_method_meta       TYPE string VALUE 'GET_META',
       gc_method_execute    TYPE string VALUE 'EXECUTE',
+      " Optional: let the tool class choose its input schema source.
+      gc_method_get_schema TYPE string VALUE 'GET_SCHEMA',
+      gc_schema_auto       TYPE char1 VALUE 'A',
+      gc_schema_manual     TYPE char1 VALUE 'M',
+      gc_schema_none       TYPE char1 VALUE 'N',
       gc_param_meta        TYPE string VALUE 'RS_META',
       gc_param_args        TYPE string VALUE 'IS_ARGS',
       gc_param_raw_args    TYPE string VALUE 'IV_ARGS',

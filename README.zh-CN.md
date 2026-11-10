@@ -35,7 +35,7 @@ git clone https://github.com/chunrichi/akit-mcp.git && cd akit-mcp && \
 ## 特性
 
 - **一个 ICF 节点，只收 POST。** `/sap/bc/mcp` 由安装器创建；没有网关、没有常驻进程、没有 SSE 流。
-- **加工具不写 JSON。** 一个 tool = 一个带 `GET_META` + `EXECUTE` 的类 + 一个 DDIC 入参结构；框架从结构推导 JSON Schema（字段名、类型、`@EndUserText.label` 文本、`required` 清单），并把 `arguments` 绑定回结构。
+- **加工具不写 JSON。** 一个 tool = 一个带 `GET_META` + `EXECUTE` 的类 + 一个 DDIC 入参结构；框架从结构推导 JSON Schema（字段名、类型、`@EndUserText.label` 文本、`required` 清单），并把 `arguments` 绑定回结构。自动 schema 不够用时，类里可实现可选方法 `GET_SCHEMA` 在 AUTO / MANUAL / NONE 之间选择。
 - **多 endpoint。** `/sap/bc/mcp/<endpoint>`；每个 endpoint 有自己的工具集（`ZTAKIT_MCP_TOOL`）与配置（`ZTAKIT_MCP_CONF`）。根路径返回 endpoint 目录。
 - **legacy + modern 双 era。** 支持 MCP `2025-03-26` / `2025-06-18` / `2025-11-25`（legacy）与 `2026-07-28`（modern：`server/discover`、每请求 `_meta`、头镜像、`resultType` 信封）。
 - **默认只读。** `READ_ONLY = X` 时 `write` 标记的工具被隐藏并拒绝；8 个内置工具全部只读。

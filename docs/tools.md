@@ -135,6 +135,7 @@
 ### table_read
 
 - **title**：`表数据读取`
+- **inputSchema**：该工具的 schema 由类里的可选方法 `GET_SCHEMA` 手工提供（MANUAL），以便给 `whereClause` 补 JSON 数组示例与 `minLength` 约束；参数绑定仍走 DDIC 结构 `ZSAKIT_MCP_TABLE_READ_ARGS`。
 - **description**：对透明表或视图执行受限只读 SELECT，支持字段投影、JSON 过滤条件、单字段排序与行数上限。只读，不加锁、不写库；默认最多 200 行，硬上限 500。
 - **授权**：`S_TABU_NAM`，`ACTVT = 03`，`TABLE = <表名>`。
 - **参数**：

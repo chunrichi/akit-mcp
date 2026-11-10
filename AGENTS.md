@@ -25,6 +25,7 @@
 - 多 endpoint：ICF 节点 `/sap/bc/mcp`，对外 `/sap/bc/mcp/<endpoint>`；注册表 `ZTAKIT_MCP_TOOL` 的 `SERVER` 字段即 endpoint；配置表 `ZTAKIT_MCP_CONF` 按 endpoint 生效，`SERVER='*'` 为全局缺省。
 - tool 类固定两个方法：`GET_META`（元数据）+ `EXECUTE`（实现），全部 `PUBLIC` / `CLASS-METHODS`；不可实例化也必须有 `FINAL CREATE PUBLIC`。
 - 入参一律走 DDIC 结构（`args_struct`），字段名即 MCP 参数名（JSON 侧 camelCase）；DDIC 字段用 `@EndUserText.label` 写中文描述（通用类型字段必须写 label）。数组/嵌套对象/自定义 schema 用 `raw_args` 模式。
+- `inputSchema` 默认由 DDIC 结构自动生成；确有不适合自动生成的部分时，工具类可实现可选方法 `GET_SCHEMA` 返回 `ty_tool_schema`（`A` AUTO / `M` MANUAL / `N` NONE），缺省或异常回退 AUTO。它只影响 schema，不影响参数绑定。
 - 鉴权、必填校验、行数上限在 tool 内完成；框架只做 required → `inputSchema` 的投影与异常兜底（不做框架级必填强制）。
 - 认证复用 ICF 登录；鉴权用标准 authorization object（内置工具：S_DEVELOP 03 / S_TABU_NAM 03，其余登录即可）。
 - 返回 `string`（JSON 文本）：正常结果是业务数据；错误抛 `ZCX_AKIT_MCP_TOOL_ERROR`。

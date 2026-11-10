@@ -36,7 +36,7 @@ abap run zcl_akit_mcp_setup
 
 ## 3. 协议回归（`abap run zcl_akit_mcp_selftest`）
 
-不经过 HTTP，直接调用 `ZCL_AKIT_MCP_SERVER=>handle( )`；输出 26 行 camelCase JSON（每行一个用例）。
+不经过 HTTP，直接调用 `ZCL_AKIT_MCP_SERVER=>handle( )`；输出 27 行 camelCase JSON（每行一个用例）。
 
 | 用例 | HTTP | 断言 |
 |---|---|---|
@@ -66,8 +66,9 @@ abap run zcl_akit_mcp_setup
 | `tool_tcode_info` | 200 | `SE38` → 程序/屏幕/文本 |
 | `tool_message_text` | 200 | `00/001` 消息文本 |
 | `tool_object_search_empty` | 200 | 零命中 → `{"objects":[],"count":0,"truncated":false}`（稳定形状） |
+| `schema_override_probe` | — | `table_read` 的可选 `GET_SCHEMA` 生效：`inputSchema` 为 MANUAL schema（含 `examples`/`minLength`） |
 
-结论：26/26 符合预期（`legacy_notification` 的 202 也是预期值）。
+结论：27/27 符合预期（`legacy_notification` 的 202 也是预期值）。
 
 ## 4. 内置工具冒烟（真实返回摘录）
 

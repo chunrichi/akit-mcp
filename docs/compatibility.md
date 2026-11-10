@@ -31,13 +31,21 @@
 
 框架用它做两件事：
 
-1. **序列化**：所有响应、tool 返回值、JSON Schema 片段都由 `/UI2/CL_JSON=>SERIALIZE` 输出（`pretty_mode-camel_case` + `compress`）。
-2. **反序列化**：JSON-RPC 请求体、`params.arguments`、modern `_meta` 都反序列化到 ABAP 结构；`_meta` 的 JSON 成员名通过 `name_mappings` 映射（`META` ↔ `_meta`）。
+1. **序列化**：响应、tool 返回值、JSON Schema 片段都由 `/UI2/CL_JSON=>SERIALIZE` 输出（`pretty_mode-camel_case`）。业务数据用 `compress` 省略初始值；协议信封与内置工具结果用 `to_json_full` 保留 `false`/`0`/空数组，保证文档里的字段形状稳定。
+2. **反序列化**：JSON-RPC 请求体、`params.arguments` 反序列化到 ABAP 结构。modern 的 `_meta` 是唯一例外：JSON 成员名是 `io.modelcontextprotocol/...` 命名空间键，而 typed deserialize 不应用 `name_mappings`（映射只在动态 `GENERATE`/`REF TO DATA` 路径生效），所以框架先文本提取 `params._meta`、去掉命名空间前缀，再反序列化到 `ty_meta`。
+
+上游参考：SAP 官方开源版 [SAP/abap-to-json](https://github.com/SAP/abap-to-json)（类 `Z_UI2_JSON`，与交付的 `/UI2/CL_JSON` 同源；`docs/basic.md`、`docs/advanced.md` 就是 `/UI2/CL_JSON` 的公开文档）。本框架遵循其文档要点：序列化/反序列化使用同一个 `pretty_mode`（camel_case）；不启用 `conversion_exits`；不做 `format_output`（固定紧凑 JSON）。静态 `SERIALIZE`/`DESERIALIZE` 每次内部都会 new 一个实例，单请求调用次数固定（≤2），可接受；批量场景可改用实例方法（`DESERIALIZE_INT`/`SERIALIZE_INT`）优化。
+
+已知边界：
+
+- 交付的 7.57 版本 `/UI2/CL_JSON` 比 `SAP/abap-to-json` 当前 `main` 旧（后者新增 `STRICT_MODE`、`DISALLOW_UNKNOWN`、`DISABLE_STRING_TYPE_DETECT` 等，见其 README 与 `docs/advanced.md`）；框架不依赖这些新参数。
+- typed deserialize 不会应用 `name_mappings`；需要 `_meta`/`$schema` 这类非法 ABAP 名时自己做提取（本框架的做法见上）。
+- 字符串转义与 Unicode 由类内部处理；`&` 不会被转成 `&amp;`（ADT classrun 控制台会显示成 `&amp;`，那是控制台转义，不是 cl_json）。
 
 因此：
 
 - 目标系统必须安装 SAP_UI 7.40+，且 `/UI2/CL_JSON` 已激活（`SE24` 可查）。
-- 升级 SAP_UI 一般不需要改框架；如果 `/UI2/CL_JSON` 行为变化（例如数字精度），回归 `tools/call` 的 `initialize`/`tools/list`/`tools/call` 三条请求即可。
+- 升级 SAP_UI 一般不需要改框架；行为变化时回归 `initialize`/`tools/list`/`tools/call` 三条请求即可。
 - 中文/特殊字符：`/UI2/CL_JSON` 输出 UTF-8 JSON，响应头固定 `application/json; charset=utf-8`。
 
 ## 3. S/4HANA 已验证项

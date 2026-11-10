@@ -31,6 +31,12 @@ CLASS zcl_akit_mcp_tools DEFINITION
                 it_required      TYPE zcl_akit_mcp_types=>ty_strings
       RETURNING VALUE(rv_schema) TYPE string.
 
+    "! Input schema for one tool, honouring an optional GET_SCHEMA override.
+    CLASS-METHODS build_input_schema
+      IMPORTING iv_class_name    TYPE seoclsname
+                is_meta          TYPE zcl_akit_mcp_types=>ty_tool_meta
+      RETURNING VALUE(rv_schema) TYPE string.
+
     "! Validate one registry row (used by the setup report).
     CLASS-METHODS validate
       IMPORTING iv_class_name TYPE seoclsname
@@ -44,6 +50,10 @@ CLASS zcl_akit_mcp_tools DEFINITION
       EXPORTING es_meta       TYPE zcl_akit_mcp_types=>ty_tool_meta
                 ev_ok         TYPE abap_bool
                 ev_message    TYPE string.
+
+    CLASS-METHODS schema_override
+      IMPORTING iv_class_name    TYPE seoclsname
+      RETURNING VALUE(rs_schema) TYPE zcl_akit_mcp_types=>ty_tool_schema.
 
     CLASS-METHODS execute_tool
       IMPORTING is_tool       TYPE zcl_akit_mcp_types=>ty_tool
@@ -116,15 +126,8 @@ CLASS zcl_akit_mcp_tools IMPLEMENTATION.
       ls_tool-sort       = ls_row-tool_sort.
       ls_tool-meta       = ls_meta.
 
-      IF ls_meta-raw_args = abap_true.
-        ls_tool-schema = ls_meta-raw_schema.
-        IF ls_tool-schema IS INITIAL.
-          ls_tool-schema = `{"type":"object","properties":{}}`.
-        ENDIF.
-      ELSE.
-        ls_tool-schema = build_schema( iv_struct_name = ls_meta-args_struct
-                                       it_required    = ls_meta-required ).
-      ENDIF.
+      ls_tool-schema = build_input_schema( iv_class_name = ls_row-tool_class
+                                           is_meta       = ls_meta ).
 
       APPEND ls_tool TO rt_tools.
     ENDLOOP.
@@ -293,6 +296,73 @@ CLASS zcl_akit_mcp_tools IMPLEMENTATION.
         IF ev_message IS INITIAL.
           ev_message = |tool { is_tool-meta-name } failed|.
         ENDIF.
+    ENDTRY.
+  ENDMETHOD.
+
+
+  METHOD build_input_schema.
+    DATA ls_override TYPE zcl_akit_mcp_types=>ty_tool_schema.
+    DATA lv_mode     TYPE char1.
+    DATA lv_struct   TYPE string.
+    DATA lv_schema   TYPE string.
+
+    lv_mode   = zcl_akit_mcp_types=>gc_schema_auto.
+    lv_struct = is_meta-args_struct.
+    lv_schema = is_meta-raw_schema.
+
+    IF is_meta-raw_args = abap_true AND lv_schema IS NOT INITIAL.
+      " Legacy flag: the class already ships its own schema text.
+      lv_mode = zcl_akit_mcp_types=>gc_schema_manual.
+    ENDIF.
+
+    ls_override = schema_override( iv_class_name = iv_class_name ).
+    IF ls_override-mode IS NOT INITIAL.
+      lv_mode = ls_override-mode.
+      IF ls_override-struct_name IS NOT INITIAL.
+        lv_struct = ls_override-struct_name.
+      ENDIF.
+      IF ls_override-schema IS NOT INITIAL.
+        lv_schema = ls_override-schema.
+      ENDIF.
+    ENDIF.
+
+    CASE lv_mode.
+      WHEN zcl_akit_mcp_types=>gc_schema_manual.
+        IF zcl_akit_mcp_json=>is_json_object( lv_schema ).
+          rv_schema = lv_schema.
+        ELSE.
+          rv_schema = `{"type":"object","properties":{}}`.
+        ENDIF.
+      WHEN zcl_akit_mcp_types=>gc_schema_none.
+        rv_schema = `{"type":"object","properties":{}}`.
+      WHEN OTHERS.
+        rv_schema = build_schema( iv_struct_name = lv_struct
+                                  it_required    = is_meta-required ).
+    ENDCASE.
+  ENDMETHOD.
+
+
+  METHOD schema_override.
+    DATA lv_method TYPE string.
+    DATA ls_schema TYPE zcl_akit_mcp_types=>ty_tool_schema.
+
+    " A dynamic call on a missing class dumps, so check the repository first.
+    SELECT SINGLE object FROM tadir INTO @DATA(lv_object)
+      WHERE pgmid = 'R3TR' AND object = 'CLAS' AND obj_name = @iv_class_name.
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
+
+    lv_method = zcl_akit_mcp_types=>gc_method_get_schema.
+
+    TRY.
+        CALL METHOD (iv_class_name)=>(lv_method)
+          RECEIVING rs_schema = ls_schema.
+        rs_schema = ls_schema.
+      CATCH cx_sy_dyn_call_illegal_method.
+        " Optional method not implemented: keep the automatic schema.
+      CATCH cx_root.
+        " A broken override must never break tools/list: fall back to auto.
     ENDTRY.
   ENDMETHOD.
 

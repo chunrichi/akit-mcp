@@ -196,7 +196,36 @@ node scripts/install.mjs
 - `args_struct` 留空；`raw_schema` 必须给合法 JSON Schema，否则退化为空 `properties`。
 - **内置工具没有任何一个使用 raw 模式**——DDIC 结构已经覆盖它们的入参；只有复杂入参才需要。
 
-## 7. 调试
+## 7. schema 来源：`GET_SCHEMA`（可选）
+
+默认 schema 来自 `args_struct`（DDIC → JSON Schema）。如果自动结果不够用，可以在工具类里**额外实现一个类方法** `GET_SCHEMA`，由它决定 schema 用哪种来源。方法不存在时框架走默认逻辑，不影响已有工具。
+
+```abap
+  PUBLIC SECTION.
+    CLASS-METHODS get_schema
+      RETURNING VALUE(rs_schema) TYPE zcl_akit_mcp_types=>ty_tool_schema.
+
+  METHOD get_schema.
+    rs_schema-mode = zcl_akit_mcp_types=>gc_schema_manual.   " A / M / N
+    rs_schema-schema =
+      `{"type":"object","properties":{` &&
+      `"tableName":{"type":"string","minLength":1},` &&
+      `"whereClause":{"type":"string","examples":["[{\"field\":\"MANDT\",\"op\":\"EQ\"}]"]}` &&
+      `},"required":["tableName"],"additionalProperties":false}`.
+  ENDMETHOD.
+```
+
+| `mode` | 行为 |
+|---|---|
+| `A`（缺省） | 用 `args_struct` 自动生成；`struct_name` 非空时改用它指定的 DDIC 结构 |
+| `M` | 直接使用 `schema`（必须是 JSON Schema object；非法时退化为空 `properties`） |
+| `N` | 无参数（`properties:{}`） |
+
+- 调用时机：`tools/list` 每个 tool 调一次；框架用动态 `CALL METHOD`，方法不存在或内部异常时回退 AUTO，不会拖垮列表。
+- **只影响 `inputSchema`，不影响参数绑定**：`EXECUTE` 的入参仍按 `args_struct`（或 `raw_args`）反序列化；要真的接收数组/对象，仍用下一节的 `raw_args` 模式。
+- 内置示例：`table_read` 用 MANUAL schema 给 `whereClause` 补 `examples` 与 `minLength`（自动 schema 无法表达"字符串里是 JSON 数组"这件事）。
+
+## 8. 调试
 
 | 手段 | 用途 |
 |---|---|
@@ -209,7 +238,7 @@ node scripts/install.mjs
 
 详细排障见 [troubleshooting.md](troubleshooting.md)。
 
-## 8. 设计建议（给模型看的 API）
+## 9. 设计建议（给模型看的 API）
 
 tool 的 `description` 与参数 schema 是产品的一部分，写作时按「模型能否选对、能否填对」检验：
 
