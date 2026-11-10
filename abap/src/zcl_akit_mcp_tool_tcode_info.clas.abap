@@ -74,7 +74,7 @@ CLASS zcl_akit_mcp_tool_tcode_info IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
-    rv_result = zcl_akit_mcp_json=>to_json( ls_result ).
+    rv_result = zcl_akit_mcp_json=>to_json_full( ls_result ).
   ENDMETHOD.
 
 ENDCLASS.

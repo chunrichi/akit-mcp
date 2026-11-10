@@ -205,7 +205,7 @@ CLASS zcl_akit_mcp_tool_ddic_get IMPLEMENTATION.
           EXPORTING iv_details = |不支持的 DDIC 对象类型 { lv_type }（支持 TABL/VIEW/STRU/DTEL）。|.
     ENDCASE.
 
-    rv_result = zcl_akit_mcp_json=>to_json( ls_result ).
+    rv_result = zcl_akit_mcp_json=>to_json_full( ls_result ).
   ENDMETHOD.
 
 

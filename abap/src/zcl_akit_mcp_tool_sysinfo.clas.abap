@@ -58,7 +58,7 @@ CLASS zcl_akit_mcp_tool_sysinfo IMPLEMENTATION.
     ls_result-server_name        = zcl_akit_mcp_types=>gc_server_name.
     ls_result-server_version     = zcl_akit_mcp_types=>gc_version.
 
-    rv_result = zcl_akit_mcp_json=>to_json( ls_result ).
+    rv_result = zcl_akit_mcp_json=>to_json_full( ls_result ).
   ENDMETHOD.
 
 ENDCLASS.

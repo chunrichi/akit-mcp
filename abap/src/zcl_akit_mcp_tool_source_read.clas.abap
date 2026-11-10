@@ -99,7 +99,7 @@ CLASS zcl_akit_mcp_tool_source_read IMPLEMENTATION.
           EXPORTING iv_details = |不支持的对象类型 { lv_type }（v1 支持 CLAS/INTF/PROG）|.
     ENDCASE.
 
-    rv_result = zcl_akit_mcp_json=>to_json( ls_result ).
+    rv_result = zcl_akit_mcp_json=>to_json_full( ls_result ).
   ENDMETHOD.
 
 

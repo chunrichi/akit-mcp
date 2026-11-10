@@ -158,7 +158,7 @@ CLASS zcl_akit_mcp_tool_obj_search IMPLEMENTATION.
 
     DESCRIBE TABLE lt_result-objects LINES lt_result-count.
 
-    rv_result = zcl_akit_mcp_json=>to_json( lt_result ).
+    rv_result = zcl_akit_mcp_json=>to_json_full( lt_result ).
   ENDMETHOD.
 
 

@@ -110,7 +110,7 @@ CLASS zcl_akit_mcp_tool_syntax_check IMPLEMENTATION.
     ls_result-line_count  = lines( lt_lines ).
     ls_result-program     = lv_program.
 
-    rv_result = zcl_akit_mcp_json=>to_json( ls_result ).
+    rv_result = zcl_akit_mcp_json=>to_json_full( ls_result ).
   ENDMETHOD.
 
 ENDCLASS.

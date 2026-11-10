@@ -278,9 +278,9 @@ CLASS zcl_akit_mcp_tool_table_read IMPLEMENTATION.
     ENDIF.
 
     " ----- compose the result envelope (rows are dynamic) -----
-    lv_table_json  = zcl_akit_mcp_json=>to_json( lv_table ).
-    lv_rows_json   = zcl_akit_mcp_json=>to_json( <lt_data> ).
-    lv_trunc_json  = zcl_akit_mcp_json=>to_json( lv_truncated ).
+    lv_table_json  = zcl_akit_mcp_json=>to_json_full( lv_table ).
+    lv_rows_json   = zcl_akit_mcp_json=>to_json_full( <lt_data> ).
+    lv_trunc_json  = zcl_akit_mcp_json=>to_json_full( lv_truncated ).
     lv_count_text  = lv_row_count.
 
     rv_result = `{"tableName":` && lv_table_json

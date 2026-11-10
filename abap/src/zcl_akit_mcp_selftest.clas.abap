@@ -75,6 +75,10 @@ CLASS zcl_akit_mcp_selftest IMPLEMENTATION.
                      is_request = request( iv_body = `{"jsonrpc":"2.0","id":103,"method":"tools/call",`
                        && `"params":{"name":"syntax_check","arguments":{"source":"REPORT ztest.\nDATA gv TYPE i.\ngv = 1.\nWRITE / gv."}}}` ) ) TO lt_cases.
 
+    APPEND run_case( iv_name    = `tool_syntax_check_invalid`
+                     is_request = request( iv_body = `{"jsonrpc":"2.0","id":108,"method":"tools/call",`
+                       && `"params":{"name":"syntax_check","arguments":{"source":"DATA gv TYPE i.\ngv = ."}}}` ) ) TO lt_cases.
+
     APPEND run_case( iv_name    = `tool_ddic_get`
                      is_request = request( iv_body = `{"jsonrpc":"2.0","id":104,"method":"tools/call",`
                        && `"params":{"name":"ddic_get","arguments":{"objectName":"DD03L"}}}` ) ) TO lt_cases.
@@ -90,6 +94,10 @@ CLASS zcl_akit_mcp_selftest IMPLEMENTATION.
     APPEND run_case( iv_name    = `tool_message_text`
                      is_request = request( iv_body = `{"jsonrpc":"2.0","id":107,"method":"tools/call",`
                        && `"params":{"name":"message_text","arguments":{"msgClass":"00","msgNo":"001"}}}` ) ) TO lt_cases.
+
+    APPEND run_case( iv_name    = `tool_object_search_empty`
+                     is_request = request( iv_body = `{"jsonrpc":"2.0","id":109,"method":"tools/call",`
+                       && `"params":{"name":"object_search","arguments":{"pattern":"ZZZ_NO_SUCH_OBJ_*"}}}` ) ) TO lt_cases.
 
     APPEND run_case( iv_name    = `legacy_unknown_tool`
                      is_request = request( iv_body = `{"jsonrpc":"2.0","id":4,"method":"tools/call",`

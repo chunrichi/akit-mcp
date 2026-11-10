@@ -81,7 +81,7 @@ CLASS zcl_akit_mcp_tool_message_text IMPLEMENTATION.
     lv_variables   = is_args-variables.
     ls_result-text = replace_variables( iv_text = ls_result-text iv_variables = lv_variables ).
 
-    rv_result = zcl_akit_mcp_json=>to_json( ls_result ).
+    rv_result = zcl_akit_mcp_json=>to_json_full( ls_result ).
   ENDMETHOD.
 
 
