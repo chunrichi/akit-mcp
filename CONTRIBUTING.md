@@ -54,7 +54,7 @@ feat(mcp)!: drop the legacy 2024-11-05 handshake
 - 文档不写内部编号（issue / PR / spec / 需求号），结论沉淀到 `docs/`。
 - 命令、URL、对象名、错误码必须与实现一致；没验证过的状态要标注「未验证」，不要写成「已支持」。
 - 表格优先、少用长段落；README 的每个能力都要落到一个可执行动作（命令 / MCP 方法 / 一行注册）。
-- `docs/research/` 是一次性调研稿，不是对外文档；结论进 `docs/design.md` 与 `AGENTS.md` 后不要长期双写。
+- 调研结论沉淀进 `docs/design.md` 与 `AGENTS.md`，不保留一次性调研稿，避免文档双写与过期。
 
 ## 5. 本地校验（不连 SAP）
 
