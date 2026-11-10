@@ -32,6 +32,8 @@ git clone https://github.com/chunrichi/akit-mcp.git && cd akit-mcp && \
 | 认证调用者 | 自建 SSO/OAuth 代理 | 复用 ICF 登录（Basic/SSO）与 SAP 权限 |
 | 发布变更 | 传 ABAP + 传 JSON 配置 | AFF 源码进 Git，`install.mjs` 幂等 |
 
+与通用 ABAP MCP SDK（[abap-ai/mcp](https://github.com/abap-ai/mcp)、[abap-ai/mcp2](https://github.com/abap-ai/mcp2)）相比，本项目刻意不做 session/resources/prompts/tasks，对象数量少得多，面向常规 ECC 项目。逐项事实对比见 [design.md 第 1.3 节](docs/design.md#13-与参考项目的关系)。
+
 ## 特性
 
 - **一个 ICF 节点，只收 POST。** `/sap/bc/mcp` 由安装器创建；没有网关、没有常驻进程、没有 SSE 流。

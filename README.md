@@ -32,6 +32,8 @@ It is built for **classic ABAP teams on ECC / S/4HANA**, not for ABAP Cloud: no 
 | Authenticate callers | Build an SSO/OAuth proxy | Reuse ICF login (Basic/SSO) and SAP authorizations |
 | Ship changes | Transport ABAP + JSON configs | AFF sources in Git, `install.mjs` is idempotent |
 
+Compared with the general-purpose ABAP MCP SDKs ([abap-ai/mcp](https://github.com/abap-ai/mcp), [abap-ai/mcp2](https://github.com/abap-ai/mcp2)) this project deliberately drops sessions, resources, prompts and tasks, ships far fewer objects, and targets regular ECC projects. The factual comparison is in [design.md §1.3](docs/design.md#13-与参考项目的关系).
+
 ## Features
 
 - **One ICF node, POST-only.** `/sap/bc/mcp` is created by the installer; no gateway, no server process, no SSE stream.
