@@ -47,3 +47,4 @@
 - `docs/writing-a-tool.md`：tool 开发指南（含 DDIC 结构、注册、调试）。
 - `docs/security.md`：认证、鉴权、部署边界、生产清单。
 - `docs/troubleshooting.md`：症状 → 原因 → 处理。
+- `docs/verification.md`：真机验证记录（环境、部署、协议回归、工具冒烟、未验证项）。

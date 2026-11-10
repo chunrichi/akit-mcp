@@ -32,6 +32,7 @@ const REQUIRED_FILES = [
   'docs/security.md',
   'docs/compatibility.md',
   'docs/troubleshooting.md',
+  'docs/verification.md',
 ];
 
 const errors = [];

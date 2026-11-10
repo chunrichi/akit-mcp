@@ -305,6 +305,7 @@ akit-mcp/
 | [docs/security.md](docs/security.md) | Authentication, authorization, deployment checklist |
 | [docs/compatibility.md](docs/compatibility.md) | SAP versions, `/UI2/CL_JSON`, verified/unverified items |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Symptom → cause → fix |
+| [docs/verification.md](docs/verification.md) | Real-system verification record (S/4HANA 757): deployment, 26 protocol cases, tool smoke tests, open items |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
 
 ## Contributing

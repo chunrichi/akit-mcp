@@ -305,6 +305,7 @@ akit-mcp/
 | [docs/security.md](docs/security.md) | 认证、鉴权、部署清单 |
 | [docs/compatibility.md](docs/compatibility.md) | SAP 版本、`/UI2/CL_JSON`、已验证/未验证项 |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | 症状 → 原因 → 处理 |
+| [docs/verification.md](docs/verification.md) | 真机验证记录（S/4HANA 757）：部署、26 个协议用例、工具冒烟、未验证项 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本历史 |
 
 ## 贡献
