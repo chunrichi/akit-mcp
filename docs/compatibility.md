@@ -68,7 +68,7 @@
 
 | 项 | 风险 | 怎么确认 |
 |---|---|---|
-| 带 Basic 认证的 HTTP 端到端 | 测试系统只有 Basic 认证；`401` 只证明节点可达，未用真实账号跑完整 `curl` 链路 | 用你自己的 SAP 账号按 [protocol.md 第 8 节](protocol.md#8-验收-curl-序列) 跑一遍 curl 序列 |
+| 带 Basic 认证的 HTTP 端到端 | 测试系统只有 Basic 认证；`401` 只证明节点可达，未用真实账号跑完整 `curl` 链路 | 用你自己的 SAP 账号按 [protocol.md 第 9 节](protocol.md#9-验收-curl-序列) 跑一遍 curl 序列 |
 | 8 个内置工具的真实数据调用 | 工具实现依赖各系统表/权限差异 | 逐个 `tools/call`，确认返回与 `isError` 行为 |
 | MCP 客户端实际连接 | Claude Code / Cursor / VS Code 的版本与行为差异 | 各连一次，看走 legacy 还是 modern、`tools/list` 是否正常 |
 | CORS 行为 | 不同 kernel 的 ICF 头处理差异 | 用浏览器/curl 带 `Origin` 验证 `403` 与预检 `204` |

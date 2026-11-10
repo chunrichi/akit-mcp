@@ -314,7 +314,34 @@ MCP Streamable HTTP 规范把会话与推送都写成可选/条件能力，因�
 - 认证只走 ICF 登录（Basic / SSO），未实现 OAuth；OAuth-only 的客户端（如 ChatGPT 自定义 connector）需要前置网关。
 - `createMessage`/sampling 等 server→client 请求不可能发生。
 
-## 8. 验收 curl 序列
+## 8. 协议覆盖度与影响
+
+按 MCP 规范逐项对照（`2025-11-25` legacy + `2026-07-28` modern）。「规范允许」= 规范把该能力写成可选/条件能力，不实现不违规；「影响」只描述真实客户端/使用场景的代价。
+
+| 能力 | 状态 | 规范性质 | 影响 |
+|---|---|---|---|
+| SSE GET 流（legacy）/ `subscriptions/listen` 流（modern） | 不实现；GET → `405` | 允许（MUST 要么流要么 405） | 无推送；需要服务端主动通知/订阅的客户端用不了；主流客户端接受 405 后正常工作 |
+| Session（`Mcp-Session-Id`） | 从不发送、收到忽略 | MAY assign | 每请求独立；不能记住协商结果；主流客户端按请求头发版本，无影响 |
+| `resources` / `resources/templates` | 不支持 → `-32601` | 可选能力，不声明 | 客户端不请求；模型只能通过 tool 取数据 |
+| `prompts` / `completions` | 不支持 → `-32601` | 可选能力，不声明 | 同上；无 prompt 模板/补全 |
+| `tasks`（含 modern task 扩展） | 不支持 → `-32601` | 可选能力，不声明 | 没有后台长任务；所有 tool 同步执行 |
+| `sampling` / `elicitation` / MRTR | 不支持 | 可选能力 | tool 执行中不能反问用户/请求客户端能力；只读开发工具不需要 |
+| `logging` / `logging/setLevel` | 不支持 → `-32601` | 可选能力，modern 已移除 | 无服务端日志推送；排错走 `selftest`/ST22 |
+| `notifications/tools/list_changed` | 不声明 | 可选（需要推送通道） | 加 tool 后客户端要重连/重拉 `tools/list` |
+| `notifications/progress` | 不发送；客户端 `progressToken` 忽略 | 可选 | 长 tool 没有进度条；内置工具是秒级，影响低 |
+| `notifications/cancelled` | 收到按通知返回 `202`，不中断执行 | 可选 | 客户端取消不会终止正在进行的一次 `tools/call` |
+| JSON-RPC batch（仅 `2025-03-26`） | 不支持；数组 body → `-32600` | 该版本允许、后续版本移除 | 只有老客户端主动发 batch 才失败；主流客户端逐条发 |
+| `2024-11-05`（HTTP+SSE 双端点） | 不支持 | 已被 Streamable HTTP 取代 | 只影响极老客户端 |
+| `outputSchema` / `structuredContent` 声明 | 返回 `structuredContent`，不声明 `outputSchema` | `outputSchema` 可选；声明了才必须符合 | 客户端不能按 schema 校验/生成输出；模型仍读 `content[0].text` |
+| `icons` / `execution`（taskSupport） / resource links | 不返回 | 均为可选字段 | 纯展示/任务能力缺失；不影响工具调用 |
+| OAuth 2.1 授权 | 不实现；复用 ICF Basic/SSO | 传输层认证实现自由 | OAuth-only 客户端（如 ChatGPT connector）需前置网关 |
+| `tools/list` 分页 cursor | 不分页，一次返回全部（注册表 ≤500 行） | cursor 可选 | 客户端按"无 nextCursor 即结束"处理，无影响 |
+| `ping` | legacy 支持；modern 按规范移除（`-32601` + `404`） | 规范一致 | 无 |
+| `initialize` 版本协商 | 支持；不支持版本 counter-offer `2025-11-25` | 规范一致 | 老客户端协商到较新形状，字段向前兼容 |
+
+结论：**主流 MCP 客户端（Claude Code / Cursor / VS Code Copilot）的 `initialize → tools/list → tools/call` 链路完整**；缺失项全是「可选能力」，影响集中在推送/长任务/资源/prompt 这类本服务刻意不做的功能，以及极老协议版本。若以后确实需要，按成本排序：`outputSchema`/`icons`/分页（低）→ batch/进度/取消（低-中）→ resources/prompts（中）→ SSE/session/tasks/MRTR（高，且会推翻无状态设计）。
+
+## 9. 验收 curl 序列
 
 以下命令在已安装并播种的 S/4HANA 系统上可直接跑（`-u` 走 ICF Basic 登录；`$URL` 换成实际主机端口）。
 
@@ -365,7 +392,7 @@ $M raw '{"jsonrpc":"2.0","id":9,"method":"ping"}'   # 发任意 JSON-RPC body
 
 `--password` 省略时在 TTY 里交互输入；也可用环境变量 `AKIT_MCP_URL` / `AKIT_MCP_USER` / `AKIT_MCP_PASSWORD`。自签证书加 `--insecure`。
 
-## 9. 与客户端的版本兼容
+## 10. 与客户端的版本兼容
 
 | 客户端 | 走的 era | 说明 |
 |---|---|---|
