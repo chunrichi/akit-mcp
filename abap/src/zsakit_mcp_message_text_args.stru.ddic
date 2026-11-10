@@ -1,0 +1,9 @@
+@EndUserText.label : 'AKIT MCP arguments - message_text'
+define structure zsakit_mcp_message_text_args {
+  @EndUserText.label : '消息类'
+  msg_class : abap.char(20);
+  @EndUserText.label : '消息编号'
+  msg_no : abap.char(3);
+  @EndUserText.label : '消息变量（| 分隔，依次替换 & 占位符）'
+  variables : abap.char(255);
+}

@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# abap-cli workspace binding (contains the SAP profile name only; created by `abap init`)
+.abap.json
+
+# Unencrypted SAP session store fallback
+.abap-cli/
+
+# Local scratch / research / real-system evidence
+tmp/
+.scratch/
+
+# abap pull output (transient; the tracked AFF sources live under abap/src/)
+# Do not ignore abap/src/** — it is the product.
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Harness agent metadata (local only)
+.agents/

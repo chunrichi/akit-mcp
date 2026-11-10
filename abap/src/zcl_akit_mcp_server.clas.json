@@ -1,0 +1,7 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "AKIT MCP - JSON-RPC 2.0 / MCP protocol dispatcher (stateless, tools only).",
+    "originalLanguage": "en"
+  }
+}

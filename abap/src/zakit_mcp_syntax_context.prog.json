@@ -1,0 +1,12 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "AKIT MCP syntax_check context report",
+    "originalLanguage": "en"
+  },
+  "generalInformation": {
+    "programType": "executableProgram",
+    "fixPointArithmetic": true,
+    "editLocked": false
+  }
+}

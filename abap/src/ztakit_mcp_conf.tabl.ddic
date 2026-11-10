@@ -1,0 +1,14 @@
+@EndUserText.label : 'AKIT MCP endpoint configuration'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table ztakit_mcp_conf {
+  key client : abap.clnt not null;
+  @EndUserText.label : 'MCP endpoint name (* = global default)'
+  key server : abap.char(30) not null;
+  @EndUserText.label : 'Configuration key'
+  key conf_name : abap.char(30) not null;
+  @EndUserText.label : 'Configuration value'
+  conf_value : abap.char(255);
+}

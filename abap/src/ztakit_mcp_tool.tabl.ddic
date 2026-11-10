@@ -1,0 +1,16 @@
+@EndUserText.label : 'AKIT MCP tool registry'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table ztakit_mcp_tool {
+  key client : abap.clnt not null;
+  @EndUserText.label : 'MCP endpoint name (URL segment)'
+  key server : abap.char(30) not null;
+  @EndUserText.label : 'Tool implementation class'
+  key tool_class : abap.char(30) not null;
+  @EndUserText.label : 'Enabled (X = exposed)'
+  tool_enabled : abap.char(1);
+  @EndUserText.label : 'Sort order in tools/list'
+  tool_sort : abap.int4;
+}

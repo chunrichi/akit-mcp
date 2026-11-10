@@ -1,0 +1,7 @@
+@EndUserText.label : 'AKIT MCP arguments - ddic_get'
+define structure zsakit_mcp_ddic_get_args {
+  @EndUserText.label : 'DDIC 对象名（表/视图/结构/数据元素/域）'
+  object_name : abap.char(30);
+  @EndUserText.label : '对象类型 TABL/VIEW/STRU/DTEL/DOMA（空=自动识别）'
+  object_type : abap.char(4);
+}

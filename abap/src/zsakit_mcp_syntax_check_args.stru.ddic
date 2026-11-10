@@ -1,0 +1,7 @@
+@EndUserText.label : 'AKIT MCP arguments - syntax_check'
+define structure zsakit_mcp_syntax_check_args {
+  @EndUserText.label : '待检查的 ABAP 源码（换行分隔，作为完整编译单元）'
+  source : abap.string;
+  @EndUserText.label : '语法检查上下文程序（空=使用内置上下文报表）'
+  program_name : abap.char(40);
+}

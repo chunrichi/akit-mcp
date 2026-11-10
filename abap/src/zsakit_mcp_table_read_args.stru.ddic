@@ -1,0 +1,13 @@
+@EndUserText.label : 'AKIT MCP arguments - table_read'
+define structure zsakit_mcp_table_read_args {
+  @EndUserText.label : '透明表或视图名'
+  table_name : abap.char(30);
+  @EndUserText.label : '返回字段（逗号分隔，空=全部）'
+  fields : abap.char(255);
+  @EndUserText.label : '过滤条件 JSON 数组：[{"field":"MATNR","op":"EQ","value":"..."}]，op 支持 EQ/NE/LT/LE/GT/GE/LIKE'
+  where_clause : abap.char(1024);
+  @EndUserText.label : '排序字段（可选 ASC/DESC，单字段）'
+  order_by : abap.char(255);
+  @EndUserText.label : '最大返回行数（0=使用 endpoint 配置上限）'
+  max_rows : abap.int4;
+}

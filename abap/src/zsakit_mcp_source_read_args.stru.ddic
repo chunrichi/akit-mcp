@@ -1,0 +1,9 @@
+@EndUserText.label : 'AKIT MCP arguments - source_read'
+define structure zsakit_mcp_source_read_args {
+  @EndUserText.label : '对象名（类/接口/报表程序）'
+  object_name : abap.char(40);
+  @EndUserText.label : '对象类型 CLAS/INTF/PROG（空=自动识别）'
+  object_type : abap.char(4);
+  @EndUserText.label : '最大返回行数（0=5000）'
+  max_lines : abap.int4;
+}

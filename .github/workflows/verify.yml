@@ -1,0 +1,31 @@
+# Local verification only: AFF source checks + documentation link checks.
+# No SAP system is involved, so this runs on a plain GitHub-hosted runner.
+name: verify
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # The repository has no runtime dependencies and no lock file yet, so
+      # there is nothing to install; `npm run verify` only invokes node scripts.
+      - name: Run verify
+        run: npm run verify

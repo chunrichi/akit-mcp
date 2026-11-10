@@ -1,0 +1,11 @@
+@EndUserText.label : 'AKIT MCP arguments - object_search'
+define structure zsakit_mcp_object_search_args {
+  @EndUserText.label : '对象名匹配模式（* 通配，无通配符时按前缀匹配）'
+  pattern : abap.char(40);
+  @EndUserText.label : '对象类型（CLAS/PROG/TABL 等，空=全部）'
+  object_type : abap.char(4);
+  @EndUserText.label : '包名过滤（空=全部包）'
+  package_name : abap.char(30);
+  @EndUserText.label : '最大返回行数（0=使用 endpoint 配置上限）'
+  max_rows : abap.int4;
+}

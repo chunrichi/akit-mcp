@@ -1,0 +1,35 @@
+{
+  "name": "akit-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MCP server implemented in ABAP, deployed with abap-cli",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chunrichi/akit-mcp.git"
+  },
+  "homepage": "https://github.com/chunrichi/akit-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/chunrichi/akit-mcp/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "install:sap": "node scripts/install.mjs",
+    "mcp": "node scripts/akit-mcp.mjs",
+    "check:aff": "node scripts/check-aff.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
+    "verify": "npm run check:aff && npm run check:docs"
+  },
+  "keywords": [
+    "abap",
+    "sap",
+    "mcp",
+    "model-context-protocol",
+    "ecc",
+    "abap-cli"
+  ],
+  "author": "",
+  "license": "MIT"
+}

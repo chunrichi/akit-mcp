@@ -1,0 +1,5 @@
+@EndUserText.label : 'AKIT MCP arguments - tcode_info'
+define structure zsakit_mcp_tcode_info_args {
+  @EndUserText.label : '事务码'
+  tcode : abap.char(20);
+}

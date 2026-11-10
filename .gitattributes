@@ -1,0 +1,24 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# ABAP / AFF sources
+*.abap text
+*.ddic text
+*.acds text
+*.abdl text
+*.json text
+*.xml text
+*.md text diff=markdown
+*.mjs text diff=javascript
+*.js text diff=javascript
+*.yml text
+*.yaml text
+
+# Denote binary files
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
