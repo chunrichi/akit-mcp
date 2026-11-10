@@ -128,7 +128,7 @@ ENDCLASS.
 
 - **入参**：正常模式 `IMPORTING is_args TYPE <args_struct>`；框架把 `params.arguments` 反序列化成结构后动态调用。字段名按 camelCase 映射。
 - **必填校验在工具里做**：`required` 只写进 `inputSchema` 给模型看，服务端**不做**框架级必填校验——`EXECUTE` 里必须自己判断空值并抛 `ZCX_AKIT_MCP_TOOL_ERROR`（否则模型可能带着空参数调用）。同理，schema 里的 `additionalProperties:false` 只是提示，服务端不拒绝未知参数。
-- **返回**：`RETURNING VALUE(rv_result) TYPE string`，内容是 JSON 文本。用 `zcl_akit_mcp_json=>to_json( ... )` 一行序列化。返回 JSON **对象**时框架额外给 `structuredContent`；返回数组/标量只有 `content[].text`。
+- **返回**：`RETURNING VALUE(rv_result) TYPE string`，内容是 JSON 文本。用 `zcl_akit_mcp_json=>to_json( ... )` 一行序列化（省略初始值，紧凑）。如果希望结果字段形状稳定（`false` / `0` / 空数组也输出，便于模型和客户端消费），改用 `zcl_akit_mcp_json=>to_json_full( ... )`——8 个内置工具都用它。返回 JSON **对象**时框架额外给 `structuredContent`；返回数组/标量只有 `content[].text`。
 - **业务错误**：抛 `ZCX_AKIT_MCP_TOOL_ERROR`（`iv_details` 是人类/模型可读的中文消息，`iv_code` 可选，默认 `TOOL_ERROR`）→ `isError:true`。其它 `CX_ROOT` 也会被兜住并转成 `isError:true`，但消息可能不可读，**不要依赖它**。
 - **鉴权**：`AUTHORITY-CHECK` 在 tool 内做，用标准授权对象；失败抛 `ZCX_AKIT_MCP_TOOL_ERROR`。框架不做权限判断。
 - **限额**：查询类工具从 `ZCL_AKIT_MCP_CONFIG=>MAX_ROWS_CURRENT( )` 取当前 endpoint 的行数上限（默认 200，硬顶 5000），工具内再按业务需要收紧。

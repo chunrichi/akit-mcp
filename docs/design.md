@@ -142,7 +142,7 @@ ENDCLASS.
 
 - **参数 schema 自动生成**：`args_struct` 指向的 DDIC 结构 → JSON Schema（字段名 camelCase、类型、`required`、描述）。
 - **参数绑定自动完成**：MCP `arguments` JSON 反序列化成 `is_args`，再动态调用 `EXECUTE`。
-- **返回**：返回 JSON 字符串，框架同时给 `content[].text` 与 `structuredContent`（结果是 JSON 对象时）。`to_json` 省略初始值；协议层用 `to_json_full` 保留 `false` 与空数组。
+- **返回**：返回 JSON 字符串，框架同时给 `content[].text` 与 `structuredContent`（结果是 JSON 对象时）。序列化工具：`to_json` 省略初始值（紧凑），`to_json_full` 保留 `false` / `0` / 空数组（字段形状稳定）。内置工具与协议层用 `to_json_full`，保证文档里的结果形状始终成立；自定义工具按需选择。
 - **错误**：抛 `ZCX_AKIT_MCP_TOOL_ERROR` → `isError:true` + 人类可读消息；其他 `CX_ROOT` 同理。
 - **固定约定**：`GET_META` 返回参数名 `RS_META`；`EXECUTE` 入参 `IS_ARGS`（normal）或 `IV_ARGS`（raw），返回参数 `RV_RESULT`，类型 `string`。工具类必须是全局类（TADIR CLAS），类名 ≤30。
 - 入参复杂（数组 / 嵌套对象 / 自定义 schema）时：`get_meta` 声明 `raw_args = abap_true` + `raw_schema`（JSON Schema 字符串），`EXECUTE` 改为 `IMPORTING iv_args TYPE string` 自行解析。
